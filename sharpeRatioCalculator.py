@@ -28,7 +28,7 @@ def data_reader(ls_symbols, startdate, enddate):
     total_days = 0
     symbol_df = {}
     for symbol in ls_symbols:
-        df = pd.read_csv('../dataPull/%s.csv' % symbol)
+        df = pd.read_csv('./data/%s.csv' % symbol)
         cond1 = (df['Date'] <= end_date_str) & (df['Date'] >= start_date_str)
         filtered_df = df[cond1]
         total_days = len(filtered_df.index)
