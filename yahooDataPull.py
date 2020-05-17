@@ -83,7 +83,7 @@ def read_symbols(s_symbols_file):
 def main():
     today = date.today().strftime('%Y%m%d')
     parser = argparse.ArgumentParser(description='Pull data from Yahoo finance')
-    parser.add_argument('-f', '--portfolio', type=str, help='Files that store the investment symbol, separate by line, format: SYMBOL, RATIO', required=True)
+    parser.add_argument('-f', '--symbol_files', type=str, help='Files that store the symbols, separate by line', required=True)
     parser.add_argument('-s', '--start', type=str, help="start time for data pull, default = 20070101   ", default="20070101")
     parser.add_argument('-e', '--end', type=str, help="end time for data pull, default = today", default=today)
     args = parser.parse_args()
