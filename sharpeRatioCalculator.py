@@ -66,6 +66,13 @@ def get_daily_value(symbol_df, symbol_count, day = 0):
 def get_daily_return(daily_values, base_values):
     na_normalized_values = np.divide(daily_values, base_values)
     daily_return = get_daily_return0(na_normalized_values)
+    '''
+    Debug for daily return
+    merged = np.concatenate((daily_values, base_values, na_normalized_values, daily_return), axis=0).reshape(4, -1)
+    merged = np.transpose(merged)
+    pd.set_option('display.max_rows', 10001)
+    print (pd.DataFrame(data=merged, columns=['daily_values', 'base_values', 'na_normalized_values', 'daily_return']))
+    '''
     return daily_return, na_normalized_values
 
 def calculate_metrics(daily_return, total_returns):
@@ -73,8 +80,7 @@ def calculate_metrics(daily_return, total_returns):
     std = np.std(daily_return)
     sharpe = avg_daily_return/std * mt.sqrt(TRADE_PER_YEAR_DAY_COUNT)
     total_return = total_returns[-1]/total_returns[0] - 1
-    average_yearly = pow(total_returns[-1]/total_returns[0], 1.0/(total_returns.shape[0]/252)) -1
-
+    average_yearly = pow(total_returns[-1]/total_returns[0], 1.0/(total_returns.shape[0]/TRADE_PER_YEAR_DAY_COUNT)) -1
     return 'total return %f %%, sharpe %f, std %f, average_daily %f %%, average_yearly %f %%' % (total_return * 100, sharpe, std, 100 * avg_daily_return, 100 * average_yearly);
 
 
@@ -104,10 +110,13 @@ def portfoilo_simulation(symbol_ratio, startdate, enddate, invest_type):
         symbol_count = get_invest_share_count(symbol_df, symbol_ratio, everytime_money, -i)
         daily_value = get_daily_value(symbol_df, symbol_count, -i)
         each_daily_value.append(daily_value)
-        base_value = np.full(daily_value.shape[0],everytime_money)
+        base_value = np.full(daily_value.shape[0], everytime_money)
         each_base_value.append(base_value)
 
     total_daily_value = np.array([])
+    # Some sample -1st:           10000 100100 100200
+    #             -2st:    10000  10010 100200 100300
+    # total:               10000  20010 200300 200500    
     for daily_value in each_daily_value:
         shape1 = total_daily_value.shape
         shape2 = daily_value.shape
@@ -116,7 +125,6 @@ def portfoilo_simulation(symbol_ratio, startdate, enddate, invest_type):
         total_daily_value = np.add(total_daily_value, daily_value)
 
     total_base_money = np.array([])
-
     for daily_base in each_base_value:
         shape1 = total_base_money.shape
         shape2 = daily_base.shape
